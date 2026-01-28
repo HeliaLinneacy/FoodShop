@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Thanh toán</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-pink-50 p-6">
+
+<div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+
+<!-- Thông tin -->
+<div class="bg-white p-6 rounded-xl shadow">
+  <h2 class="font-bold text-lg text-pink-600 mb-4">🚚 Thông tin giao hàng</h2>
+
+  <input id="name" placeholder="Họ tên"
+    class="w-full border p-2 rounded mb-3">
+
+  <input id="phone" placeholder="Số điện thoại"
+    class="w-full border p-2 rounded mb-3">
+
+  <input id="address" placeholder="Địa chỉ"
+    class="w-full border p-2 rounded mb-3">
+
+  <select id="pay" class="w-full border p-2 rounded">
+    <option>COD</option>
+    <option>Chuyển khoản</option>
+  </select>
+</div>
+
+<!-- Đơn hàng -->
+<div class="bg-white p-6 rounded-xl shadow">
+  <h2 class="font-bold text-lg text-pink-600 mb-4">🛒 Đơn hàng</h2>
+  <div id="items"></div>
+
+  <div class="flex justify-between font-bold mt-4">
+    <span>Tổng:</span>
+    <span id="total">0đ</span>
+  </div>
+
+  <button onclick="pay()"
+    class="w-full mt-5 bg-pink-600 text-white py-3 rounded">
+    ✅ Xác nhận thanh toán
+  </button>
+</div>
+
+</div>
+
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+function render(){
+  let total = 0;
+  const box = document.getElementById("items");
+  box.innerHTML = "";
+
+  cart.forEach(i=>{
+    const sum = i.price * i.qty;
+    total += sum;
+    box.innerHTML += `
+      <div class="flex justify-between mb-2">
+        <span>${i.name} x ${i.qty}</span>
+        <span>${sum.toLocaleString()}đ</span>
+      </div>
+    `;
+  });
+
+  document.getElementById("total").innerText =
+    total.toLocaleString() + "đ";
+}
+
+function pay(){
+  if(cart.length === 0){
+    alert("Giỏ hàng trống!");
+    return;
+  }
+
+  orders.push({
+    id: "DH" + Date.now(),
+    items: cart,
+    total: cart.reduce((s,i)=>s+i.price*i.qty,0),
+    status: "Đang xử lý"
+  });
+
+  localStorage.setItem("orders", JSON.stringify(orders));
+  localStorage.removeItem("cart");
+
+  alert("🎉 Thanh toán thành công!");
+  window.location.href = "/user";   // hoặc "/"
+}
+
+render();
+</script>
+
+</body>
+</html>

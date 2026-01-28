@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Shop Đồ Ăn Vặt</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-pink-50">
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div id="flash-message" class="bg-green-100 text-green-700 px-4 py-3 text-center">
+  {{ messages[0] }}
+</div>
+{% endif %}
+{% endwith %}
+<!-- HEADER -->
+<header class="bg-white shadow sticky top-0 z-10">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row gap-4 items-center">
+    <h1 class="text-2xl font-bold text-pink-600">🍭 Shop Đồ Ăn Vặt</h1>
+
+    <input id="search"
+      class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-400"
+      placeholder="Tìm đồ ăn vặt...">
+
+    <form action="/user-action" method="post">
+    <select name="action" onchange="this.form.submit()"
+      class="border px-3 py-2 rounded-lg">
+        <option value="">👤</option>
+        <option value="edit">✏️ Sửa thông tin người dùng</option>
+        <option value="logout">🚪 Đăng xuất</option>
+    </select>
+</form>
+
+    <a href="/cart"
+      class="bg-pink-600 text-white px-4 py-2 rounded-lg">
+      🛒 Giỏ (<span id="cartCount">0</span>)
+    </a>
+  </div>
+</header>
+
+<!-- PRODUCTS -->
+<section class="max-w-7xl mx-auto px-6 py-10">
+  <h2 class="text-3xl font-bold text-center mb-8">Menu Ăn Vặt 😋</h2>
+  <div id="products" class="grid md:grid-cols-4 gap-6"></div>
+</section>
+
+<script>
+const products = [
+  {id:1,name:"Bánh tráng trộn",price:25000,img:"https://via.placeholder.com/300"},
+  {id:2,name:"Trà sữa trân châu",price:30000,img:"https://via.placeholder.com/300"},
+  {id:3,name:"Xiên que",price:20000,img:"https://via.placeholder.com/300"},
+  {id:4,name:"Snack rong biển",price:15000,img:"https://via.placeholder.com/300"},
+];
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function renderProducts(list){
+  const box = document.getElementById("products");
+  box.innerHTML = "";
+  list.forEach(p=>{
+    box.innerHTML += `
+      <div class="bg-white rounded-lg shadow p-4 text-center">
+        <img src="${p.img}" class="rounded mb-2">
+        <h3 class="font-semibold">${p.name}</h3>
+        <p class="text-pink-600 font-bold">${p.price.toLocaleString()}đ</p>
+        <button onclick="addToCart(${p.id})"
+          class="mt-2 bg-pink-500 text-white px-4 py-2 rounded">
+          Thêm vào giỏ
+        </button>
+      </div>`;
+  });
+}
+
+function addToCart(id){
+  const item = cart.find(i=>i.id===id);
+  if(item) item.qty++;
+  else{
+    const p = products.find(p=>p.id===id);
+    cart.push({...p, qty:1});
+  }
+  localStorage.setItem("cart",JSON.stringify(cart));
+  updateCartCount();
+  alert("Đã thêm vào giỏ!");
+}
+
+function updateCartCount(){
+  document.getElementById("cartCount").innerText =
+    cart.reduce((s,i)=>s+i.qty,0);
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+  const k = e.target.value.toLowerCase();
+  renderProducts(products.filter(p=>p.name.toLowerCase().includes(k)));
+});
+
+renderProducts(products);
+updateCartCount();
+const flash = document.getElementById("flash-message");
+  if (flash) {
+    setTimeout(() => {
+      flash.style.transition = "opacity 0.5s";
+      flash.style.opacity = "0";
+      setTimeout(() => flash.remove(), 500);
+    }, 3000); // 3 giây
+  }
+</script>
+</body>
+</html>

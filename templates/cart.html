@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Giỏ hàng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-pink-50">
+
+<div class="max-w-4xl mx-auto p-6">
+  <h1 class="text-2xl font-bold mb-4">🛒 Giỏ hàng</h1>
+  <div id="list"></div>
+
+  <div class="bg-white p-4 rounded shadow mt-4 flex justify-between">
+    <b>Tổng:</b>
+    <b id="total" class="text-pink-600">0đ</b>
+  </div>
+
+  <!-- ✅ NÚT THANH TOÁN -->
+  <a href="/checkout"
+     class="block text-center w-full mt-4 bg-pink-600 text-white py-3 rounded">
+     💳 Thanh toán
+  </a>
+</div>
+
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function render(){
+  let total = 0;
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  cart.forEach((i,idx)=>{
+    total += i.price*i.qty;
+    list.innerHTML += `
+      <div class="bg-white p-4 rounded shadow mb-2 flex justify-between">
+        <div>
+          <b>${i.name}</b><br>
+          ${i.price.toLocaleString()}đ
+        </div>
+        <div>
+          <button onclick="qty(${idx},-1)">−</button>
+          ${i.qty}
+          <button onclick="qty(${idx},1)">+</button>
+        </div>
+      </div>`;
+  });
+
+  document.getElementById("total").innerText =
+    total.toLocaleString()+"đ";
+  localStorage.setItem("cart",JSON.stringify(cart));
+}
+
+function qty(i,d){
+  cart[i].qty += d;
+  if(cart[i].qty <= 0) cart.splice(i,1);
+  render();
+}
+
+render();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel - Quản lý</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+</head>
+
+<body class="bg-pink-50">
+<header class="bg-white shadow border-b px-6 py-4 flex justify-between items-center">
+  <h1 class="font-bold text-xl text-pink-600">🌸 Quản lý Admin</h1>
+
+  <form action="/user-action" method="post">
+    <select name="action"
+      onchange="this.form.submit()"
+      class="border px-3 py-2 rounded-lg focus:ring-2 focus:ring-pink-400">
+        <option value="">👤 Admin</option>
+        <option value="edit">✏️ Sửa thông tin</option>
+        <option value="logout">🚪 Đăng xuất</option>
+    </select>
+  </form>
+</header>
+
+
+
+<div class="flex min-h-screen">
+
+  <!-- SIDEBAR -->
+  <aside class="w-64 bg-white border-r">
+  <div class="p-5 text-xl font-bold text-pink-600">Admin Panel</div>
+
+    <nav class="px-3 space-y-1">
+      <button onclick="showPage('dashboard')" class="menu-btn">📊 Thống kê</button>
+      <button onclick="showPage('users')" class="menu-btn">👤 Người dùng</button>
+      <button onclick="showPage('products')" class="menu-btn">🍪 Đồ ăn vặt</button>
+      <button onclick="showPage('orders')" class="menu-btn">🛒 Đơn hàng</button>
+      <button onclick="showPage('reviews')" class="menu-btn">⭐ Đánh giá</button>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1">
+
+    <!-- HEADER -->
+    <header class="bg-pink border-b px-6 py-4 flex justify-between items-center">
+      <h1 class="font-semibold text-lg">Quản lý Admin</h1>
+      <div class="flex items-center gap-3">
+        <div class="text-right">
+          <p class="font-medium">Admin User</p>
+          <p class="text-sm text-gray-500">admin@gmail.com</p>
+        </div>
+        <div class="w-10 h-10 bg-pink-600 text-pink rounded-full flex items-center justify-center">
+          A
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <section class="p-6 space-y-6">
+
+      <!-- DASHBOARD -->
+      <div id="dashboard" class="page hidden space-y-4">
+  <h2 class="text-2xl font-bold">📊 Trang thống kê</h2>
+
+  <div class="grid grid-cols-4 gap-4">
+    <div class="bg-pink-100 p-4 rounded shadow">
+      👤 Người dùng
+      <p id="totalUsers" class="text-2xl font-bold"></p>
+    </div>
+
+    <div class="bg-pink-100 p-4 rounded shadow">
+      🍪 Sản phẩm
+      <p id="totalProducts" class="text-2xl font-bold"></p>
+    </div>
+
+    <div class="bg-pink-100 p-4 rounded shadow">
+      🛒 Đơn hàng
+      <p id="totalOrders" class="text-2xl font-bold"></p>
+    </div>
+
+    <div class="bg-pink-100 p-4 rounded shadow">
+      ⭐ Đánh giá
+      <p id="totalReviews" class="text-2xl font-bold"></p>
+    </div>
+  </div>
+</div>
+
+
+      <!-- USERS -->
+      <div id="users" class="page hidden">
+  <h2 class="text-2xl font-bold mb-4">👤 Quản lý người dùng</h2>
+  <table class="w-full bg-pink-100 rounded shadow">
+    <tr class="border-b">
+      <th class="p-2">Tên</th>
+      <th>Email</th>
+      <th>Quyền</th>
+    </tr>
+    <tbody id="userTable"></tbody>
+  </table>
+</div>
+
+
+      <!-- PRODUCTS -->
+      <div id="products" class="page hidden">
+  <h2 class="text-2xl font-bold mb-4">🍪 Quản lý sản phẩm</h2>
+  <table class="w-full bg-pink-100 rounded shadow">
+    <tr class="border-b">
+      <th class="p-2">Tên</th>
+      <th>Giá</th>
+      <th>Tồn kho</th>
+    </tr>
+    <tbody id="productTable"></tbody>
+  </table>
+</div>
+
+
+      <!-- ORDERS -->
+      <div id="orders" class="page hidden">
+  <h2 class="text-2xl font-bold mb-4">🛒 Quản lý đơn hàng</h2>
+  <table class="w-full bg-pink-100 rounded shadow">
+    <tr class="border-b">
+      <th class="p-2">Mã</th>
+      <th>Khách hàng</th>
+      <th>Tổng tiền</th>
+      <th>Trạng thái</th>
+    </tr>
+    <tbody id="orderTable"></tbody>
+  </table>
+</div>
+
+
+      <!-- REVIEWS -->
+      <div id="reviews" class="page">
+
+        <h2 class="text-2xl font-bold mb-4">⭐ Quản lý đánh giá</h2>
+
+        <input id="search" onkeyup="render()" 
+          class="border px-4 py-2 rounded-lg mb-4 w-full"
+          placeholder="🔍 Tìm kiếm đánh giá...">
+
+        <div id="reviewList" class="space-y-4"></div>
+
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<style>
+.menu-btn{
+  width:100%;
+  text-align:left;
+  padding:10px;
+  border-radius:8px;
+  transition: 0.2s;
+}
+
+.menu-btn:hover{
+  background:#fce7f3;   
+  color:#be185d;           
+}
+
+.active{
+  background:#fbcfe8;      
+  color:#be185d;          
+  font-weight:600;
+}
+
+.hidden{
+  display:none;
+}
+
+</style>
+
+<script>
+/* ===== MENU CONTROL ===== */
+function showPage(pageId){
+  document.querySelectorAll(".page").forEach(p=>{
+    p.classList.add("hidden");
+  });
+  document.getElementById(pageId).classList.remove("hidden");
+
+  if(pageId==="dashboard") renderDashboard();
+  if(pageId==="users") renderUsers();
+  if(pageId==="products") renderProductsAdmin();
+  if(pageId==="orders") renderOrders();
+}
+
+function renderDashboard(){
+  document.getElementById("totalUsers").innerText = users.length;
+  document.getElementById("totalProducts").innerText = products.length;
+  document.getElementById("totalOrders").innerText = orders.length;
+  document.getElementById("totalReviews").innerText = reviews.length;
+}
+function renderUsers(){
+  const tb = document.getElementById("userTable");
+  tb.innerHTML = "";
+  users.forEach(u=>{
+    tb.innerHTML += `
+      <tr class="border-b text-center">
+        <td class="p-2">${u.name}</td>
+        <td>${u.email}</td>
+        <td>${u.role}</td>
+      </tr>
+    `;
+  });
+}
+function renderProductsAdmin(){
+  const tb = document.getElementById("productTable");
+  tb.innerHTML = "";
+  products.forEach(p=>{
+    tb.innerHTML += `
+      <tr class="border-b text-center">
+        <td class="p-2">${p.name}</td>
+        <td>${p.price.toLocaleString()}đ</td>
+        <td>${p.stock}</td>
+      </tr>
+    `;
+  });
+}
+function renderOrders(){
+  const tb = document.getElementById("orderTable");
+  tb.innerHTML = "";
+  orders.forEach(o=>{
+    tb.innerHTML += `
+      <tr class="border-b text-center">
+        <td class="p-2">#${o.id}</td>
+        <td>${o.customer}</td>
+        <td>${o.total.toLocaleString()}đ</td>
+        <td>${o.status}</td>
+      </tr>
+    `;
+  });
+}
+
+
+/* ===== REVIEWS DATA ===== */
+const reviews = [
+  { customer:"Nguyễn Văn A", product:"Bánh trứng muối", rating:5, comment:"Rất ngon", status:"approved" },
+  { customer:"Trần Thị B", product:"Kẹo dẻo", rating:4, comment:"Hơi ngọt", status:"approved" },
+  { customer:"Lê Văn C", product:"Snack phô mai", rating:3, comment:"Bình thường", status:"pending" },
+  { customer:"Hoàng Văn E", product:"Bánh quy", rating:2, comment:"Bị vỡ", status:"rejected" },
+];
+
+/* ===== DATA ===== */
+
+// USERS
+const users = [
+  {name:"Nguyễn Văn A", email:"a@gmail.com", role:"User"},
+  {name:"Trần Thị B", email:"b@gmail.com", role:"Admin"},
+  {name:"Lê Văn C", email:"c@gmail.com", role:"User"},
+];
+
+// PRODUCTS
+const products = [
+  {name:"Bánh tráng trộn", price:25000, stock:20},
+  {name:"Trà sữa", price:30000, stock:15},
+  {name:"Snack rong biển", price:15000, stock:50},
+];
+
+// ORDERS
+const orders = [
+  {id:1, customer:"Nguyễn Văn A", total:120000, status:"Đang xử lý"},
+  {id:2, customer:"Trần Thị B", total:75000, status:"Hoàn thành"},
+  {id:3, customer:"Lê Văn C", total:45000, status:"Đã huỷ"},
+];
+
+
+function render(){
+  const keyword = document.getElementById("search").value.toLowerCase();
+  const list = document.getElementById("reviewList");
+  list.innerHTML = "";
+
+  const filtered = reviews.filter(r =>
+    r.customer.toLowerCase().includes(keyword) ||
+    r.product.toLowerCase().includes(keyword) ||
+    r.comment.toLowerCase().includes(keyword)
+  );
+
+  filtered.forEach((r,index)=>{
+    list.innerHTML += `
+      <div class="bg-white p-4 rounded shadow">
+        <b>${r.customer}</b> - ${r.product}
+        <p>⭐ ${r.rating}/5</p>
+        <p>${r.comment}</p>
+
+        <div class="flex gap-2 mt-3">
+          <button onclick="approve(${index})" class="px-3 py-1 border rounded text-pink-600">Duyệt</button>
+          <button onclick="reject(${index})" class="px-3 py-1 border rounded text-pink-600">Từ chối</button>
+          <button onclick="reply()" class="px-3 py-1 border rounded text-pink-600 ml-auto">Phản hồi</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function approve(i){
+  reviews[i].status = "approved";
+  alert("✅ Đã duyệt đánh giá!");
+  render();
+}
+
+function reject(i){
+  reviews[i].status = "rejected";
+  alert("❌ Đã từ chối đánh giá!");
+  render();
+}
+
+function reply(){
+  const text = prompt("Nhập phản hồi:");
+  if(text){
+    alert("📩 Đã gửi phản hồi!");
+  }
+}
+
+render();
+</script>
+
+</body>
+</html>
