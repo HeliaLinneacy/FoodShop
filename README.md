@@ -94,15 +94,14 @@ Hệ thống minh họa đầy đủ quy trình nghiệp vụ từ **người d�
 - Role – User: 1 – n  
 
 
-
 ## 6. Kiến trúc & công nghệ sử dụng
 
 - **Ngôn ngữ:** Python 3.x  
-- **Framework:** Django  
-- **CSDL:** SQLite (có thể nâng cấp MySQL/PostgreSQL)  
+- **Framework:** Flask  
+- **CSDL:** MySQL  
 - **Frontend:** HTML, CSS, Bootstrap  
-- **Template Engine:** Django Template + Template Inheritance  
-- **ORM:** Django ORM  
+- **Template Engine:** Jinja2  
+- **ORM / Data Access:** MySQL Connector 
 - **Quản lý mã nguồn:** Git + GitHub  
 
 
